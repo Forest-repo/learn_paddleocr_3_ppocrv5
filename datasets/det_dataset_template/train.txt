@@ -1,0 +1,2 @@
+images/demo_001.jpg	[{"transcription":"示例文字","points":[[10,20],[200,20],[200,60],[10,60]]}]
+

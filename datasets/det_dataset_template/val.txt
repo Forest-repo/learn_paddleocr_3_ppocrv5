@@ -1,0 +1,2 @@
+images/demo_val_001.jpg	[{"transcription":"验证文字","points":[[12,24],[180,24],[180,58],[12,58]]}]
+
