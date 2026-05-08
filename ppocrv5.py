@@ -21,7 +21,7 @@ predict_start = time.perf_counter()
 #     use_doc_unwarping=False,
 #     use_textline_orientation=False,
 # ) # 更换 PP-OCRv5_server 模型
-result = ocr.predict("费用组-单票-商业发票-007.png")
+result = ocr.predict("test.jpg")
 print(f"OCR 推理耗时: {time.perf_counter() - predict_start:.3f}s")
 save_start = time.perf_counter()
 ocr_items = []
