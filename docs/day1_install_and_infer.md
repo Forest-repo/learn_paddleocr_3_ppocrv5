@@ -16,7 +16,7 @@ Python: 3.9 - 3.12 之间优先选官方支持范围内的稳定版本
 
 ## 2. CPU 安装
 
-在项目根目录执行：
+在项目根目录执行： conda create --name paddle32_ppocrv5 python=3.11
 
 ```powershell
 python -m venv .venv
@@ -182,7 +182,110 @@ rec_boxes    识别框矩形坐标，具体取决于版本和配置
 
 每个 `dt_polys` 是一个文本框，通常是顺时针或接近顺时针的四个点。
 
-## 10. 第一天验收标准
+## 10. OCR 结果 JSON 详细说明
+
+PaddleOCR 保存到 `output` 目录下的 `*_res.json`，整体可以分成三类：输入信息、模型配置、OCR 结果。
+
+最关键的是这几组字段：
+
+```json
+"rec_texts": [...]
+"rec_scores": [...]
+"rec_polys": [...]
+"rec_boxes": [...]
+```
+
+它们是按下标一一对应的。比如：
+
+```text
+rec_texts[0]  -> "COMMERCIAL INVOICE"
+rec_scores[0] -> 0.9870749711990356
+rec_polys[0]  -> [[458, 73], [740, 73], [740, 104], [458, 104]]
+rec_boxes[0]  -> [458, 73, 740, 104]
+```
+
+意思是：第 1 个识别结果内容是 `COMMERCIAL INVOICE`，置信度约 `0.9871`，它在图片上的位置是这个四边形区域。
+
+字段解释：
+
+```text
+input_path       输入图片路径。
+page_index       页码索引。单张图片一般是 null；如果是 PDF 或多页输入，可能会有页码。
+model_settings   这次 OCR 开启/关闭了哪些模型能力。
+dt_polys         detection 阶段找到的文本框，每个元素是一个四点坐标框。顺时针方向，四个点
+rec_texts        识别出来的文本内容列表。
+rec_scores       每条文本的识别置信度，越接近 1 越可信。
+rec_polys        识别结果对应的四点坐标，一般和 dt_polys 很接近。顺时针方向，四个点  
+rec_boxes        矩形框坐标，格式是 [x_min, y_min, x_max, y_max]。
+```
+
+`model_settings` 示例：
+
+```json
+{
+  "use_doc_preprocessor": false,
+  "use_textline_orientation": false
+}
+```
+
+这里表示没有启用文档预处理，也没有启用文本行方向分类。
+
+`dt_polys` 和 `rec_polys` 的四点坐标格式通常是：
+
+```text
+[
+  [左上x, 左上y],
+  [右上x, 右上y],
+  [右下x, 右下y],
+  [左下x, 左下y]
+]
+```
+
+`rec_boxes` 比 `rec_polys` 简单，但只能表达水平矩形框，不能表达倾斜框。
+
+`rec_polys` 不是识别模型重新预测出来的新坐标。更准确地说：
+
+```text
+dt_polys   检测阶段输出的文本框。
+rec_polys  最终识别结果对应的文本框。
+```
+
+OCR pipeline 中间通常是这样的：
+
+```text
+检测模型输出 dt_polys
+  -> 按框裁剪图片
+  -> 可选：方向分类、旋转校正
+  -> 文本识别
+  -> 可选：按 text_rec_score_thresh 过滤低置信度结果
+  -> 输出 rec_texts / rec_scores / rec_polys
+```
+
+所以 `dt_polys` 更偏“检测阶段原始找到的框”，`rec_polys` 更偏“最终识别结果对应的框”。如果中间有过滤、排序或其他后处理，检测出来的框不一定都会进入最终识别结果。
+
+在当前示例里，因为流程比较简单，而且没有过滤掉结果，所以 `dt_polys` 和 `rec_polys` 基本一样。但做 `(内容, 置信度, 坐标)` 三元组时，用 `rec_polys` 更合适，因为它和最终的 `rec_texts`、`rec_scores` 天然一一对应。
+
+如果要在代码里保存“内容、置信度、坐标”，可以把这三个数组按下标组合起来：
+
+```python
+ocr_items = list(zip(rec_texts, rec_scores, rec_polys))
+```
+
+也就是：
+
+```text
+(content, confidence, coordinate)
+```
+
+对应：
+
+```text
+(rec_texts[i], rec_scores[i], rec_polys[i])
+```
+
+例如 `费用组-单票-商业发票-007_res.json` 里一共有 30 条识别结果，因为 `rec_texts`、`rec_scores`、`rec_polys`、`rec_boxes` 都是 30 个元素。
+
+## 11. 第一天验收标准
 
 你完成这些就算第 1 天成功：
 

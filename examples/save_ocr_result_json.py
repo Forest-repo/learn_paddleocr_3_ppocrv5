@@ -28,7 +28,7 @@ def to_builtin(value: Any) -> Any:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--image", required=True)
+    parser.add_argument("--image", default="费用组-单票-商业发票-007.png")
     parser.add_argument("--output", default="outputs/ocr_result.json")
     parser.add_argument("--device", default="cpu")
     args = parser.parse_args()

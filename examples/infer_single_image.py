@@ -58,7 +58,7 @@ def result_to_builtin(result: Any) -> Any:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--image", required=True, help="Path to input image.")
+    parser.add_argument("--image", default="费用组-单票-商业发票-007.png", help="Path to input image.")
     parser.add_argument("--device", default="cpu", help="cpu, gpu, gpu:0, etc.")
     parser.add_argument("--lang", default="ch", help="Recognition language, e.g. ch/en.")
     parser.add_argument(
@@ -72,7 +72,7 @@ def main() -> None:
         action="store_true",
         help="Enable text line orientation classification for rotated text.",
     )
-    parser.add_argument("--json-out", help="Optional JSON output path.")
+    parser.add_argument("--json-out", default="outputs/test.json", help="Optional JSON output path.")
     args = parser.parse_args()
 
     image_path = Path(args.image)

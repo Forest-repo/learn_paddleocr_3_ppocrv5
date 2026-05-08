@@ -51,7 +51,7 @@ def iter_images(input_dir: Path) -> list[Path]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input-dir", required=True)
+    parser.add_argument("--input-dir", default=".")
     parser.add_argument("--output-dir", default="outputs/json")
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--lang", default="ch")
