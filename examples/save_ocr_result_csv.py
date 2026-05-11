@@ -62,7 +62,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--image", default="费用组-单票-商业发票-007.png")
     parser.add_argument("--output", default="outputs/ocr_result.csv")
-    parser.add_argument("--device", default="cpu")
+    parser.add_argument("--device", default="gpu")
     args = parser.parse_args()
 
     ocr = PaddleOCR(

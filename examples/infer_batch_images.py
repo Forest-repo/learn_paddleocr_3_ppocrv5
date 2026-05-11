@@ -53,7 +53,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input-dir", default=".")
     parser.add_argument("--output-dir", default="outputs/json")
-    parser.add_argument("--device", default="cpu")
+    parser.add_argument("--device", default="gpu")
     parser.add_argument("--lang", default="ch")
     args = parser.parse_args()
 

@@ -59,7 +59,7 @@ def result_to_builtin(result: Any) -> Any:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--image", default="费用组-单票-商业发票-007.png", help="Path to input image.")
-    parser.add_argument("--device", default="cpu", help="cpu, gpu, gpu:0, etc.")
+    parser.add_argument("--device", default="gpu", help="cpu, gpu, gpu:0, etc.")
     parser.add_argument("--lang", default="ch", help="Recognition language, e.g. ch/en.")
     parser.add_argument(
         "--model-size",
@@ -72,6 +72,8 @@ def main() -> None:
         action="store_true",
         help="Enable text line orientation classification for rotated text.",
     )
+    # Using official model (PP-LCNet_x1_0_textline_ori), the model files will be automatically downloaded 
+    # and saved in `C:\Users\Forest\.paddlex\official_models\PP-LCNet_x1_0_textline_ori`.
     parser.add_argument("--json-out", default="outputs/test.json", help="Optional JSON output path.")
     args = parser.parse_args()
 
@@ -81,9 +83,12 @@ def main() -> None:
 
     ocr = build_ocr(args)
     results = ocr.predict(str(image_path))
+    print("type Results:", type(results)) # <class 'list'>
+    print(len(results)) # 1
+    print(results)
     payload = result_to_builtin(results)
 
-    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    # print(json.dumps(payload, ensure_ascii=False, indent=2)) ##json.dumps()函数将Python对象编码成JSON字符串，ensure_ascii=False参数允许输出非ASCII字符，indent=2参数使输出更易读。
 
     if args.json_out:
         out_path = Path(args.json_out)
